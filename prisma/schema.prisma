@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── NextAuth Models ──────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Application Models ───────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          String    @default("CLIENT") // CLIENT | ADMIN
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  subscriptions Subscription[]
+  domains       Domain[]
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String   // Starter | Business | Enterprise
+  ramGB       Int
+  vCpuCores   Int
+  storageGB   Int
+  priceMonthly Float
+  createdAt   DateTime @default(now())
+
+  vps VPS[]
+}
+
+model VPS {
+  id          String   @id @default(cuid())
+  providerId  String?  // ID en Contabo
+  ipAddress   String?
+  status      String   @default("PENDING") // PENDING | PROVISIONING | ACTIVE | STOPPED
+  planId      String
+  createdAt   DateTime @default(now())
+
+  plan        Plan         @relation(fields: [planId], references: [id])
+  deployments Deployment[]
+}
+
+model Deployment {
+  id        String   @id @default(cuid())
+  vpsId     String
+  domain    String?
+  addonType String   // ERPNext | n8n
+  adminPass String?
+  status    String   @default("INSTALLING") // INSTALLING | ACTIVE | ERROR | STOPPED
+  createdAt DateTime @default(now())
+
+  vps VPS @relation(fields: [vpsId], references: [id])
+}
+
+model Domain {
+  id             String    @id @default(cuid())
+  name           String    @unique
+  provider       String    @default("NameSilo") // NameSilo | External
+  autoRenew      Boolean   @default(true)
+  expirationDate DateTime?
+  userId         String?
+  createdAt      DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id        String    @id @default(cuid())
+  userId    String
+  status    String    @default("ACTIVE") // ACTIVE | EXPIRED | CANCELLED | PAST_DUE
+  stripeId  String?
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+}

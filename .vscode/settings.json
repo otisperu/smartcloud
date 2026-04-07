@@ -1,0 +1,83 @@
+{
+  // ─── Editor ───────────────────────────────────────────────────────────────
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // ─── TypeScript ───────────────────────────────────────────────────────────
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // ─── Tailwind CSS ─────────────────────────────────────────────────────────
+  "tailwindCSS.experimental.classRegex": [
+    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+  "tailwindCSS.includeLanguages": {
+    "typescriptreact": "html"
+  },
+
+  // ─── Files ────────────────────────────────────────────────────────────────
+  "files.associations": {
+    "*.css": "tailwindcss",
+    "*.env*": "dotenv"
+  },
+  "files.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/.git": true
+  },
+
+  // ─── ESLint ───────────────────────────────────────────────────────────────
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  // ─── Spell checker ────────────────────────────────────────────────────────
+  "cSpell.language": "en,es",
+  "cSpell.words": [
+    "smartcloudops",
+    "dokploy",
+    "contabo",
+    "namesilo",
+    "bcryptjs",
+    "prisma",
+    "cuid",
+    "nextauth",
+    "tailwindcss",
+    "lucide",
+    "zustand",
+    "meilisearch",
+    "valkey",
+    "daphne",
+    "uvicorn",
+    "gunicorn",
+    "backblaze",
+    "rclone"
+  ],
+
+  // ─── Prettier ─────────────────────────────────────────────────────────────
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  }
+}
