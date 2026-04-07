@@ -2,7 +2,6 @@ FROM node:20-alpine AS base
 
 # ── Stage 1: Dependencias ──────────────────────────────────────────────────
 FROM base AS deps
-# Instalamos libc6-compat y openssl para que Prisma funcione en Alpine
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
@@ -12,22 +11,17 @@ RUN npm ci
 
 # ── Stage 2: Construcción ───────────────────────────────────────────────────
 FROM base AS builder
-# Necesitamos openssl también en el builder para prisma generate
 RUN apk add --no-cache openssl
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Desactivamos telemetría
 ENV NEXT_TELEMETRY_DISABLED=1
-
-# Generamos el Cliente de Prisma
-RUN npx prisma generate
-
-# IMPORTANTE: Saltamos el chequeo de base de datos durante el build de Next.js
-# Esto evita que el despliegue falle si el VPS de base de datos no está listo
 ENV SKIP_PRISMA_BUILD_CHECK=true
+
+# Generamos el Cliente de Prisma (binarios para linux-musl-openssl-3.0.x)
+RUN npx prisma generate
 RUN npm run build
 
 # ── Stage 3: Ejecución Producción ──────────────────────────────────────────
@@ -37,16 +31,33 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# openssl es requerido por Prisma en Alpine
+RUN apk add --no-cache openssl
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Creamos la carpeta public si no existe para evitar errores al copiar
 RUN mkdir -p public
 
-# Copiamos solo lo necesario del builder (archivo standalone)
+# Output standalone de Next.js
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# CRÍTICO: Copiar binarios nativos de Prisma (no se incluyen en standalone automáticamente)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma/client ./node_modules/@prisma/client
+
+# Prisma CLI para poder ejecutar db push en startup
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+
+# Schema de Prisma para db push
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
+# Script de inicio con migraciones
+COPY --chown=nextjs:nodejs entrypoint.sh ./entrypoint.sh
+RUN chmod +x entrypoint.sh
 
 USER nextjs
 
@@ -54,4 +65,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+# Aplicar schema a la BD y arrancar Next.js
+CMD ["sh", "entrypoint.sh"]

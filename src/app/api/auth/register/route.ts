@@ -45,9 +45,16 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("[REGISTER]", error);
+    const message = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : undefined;
+    console.error("[REGISTER ERROR]", message);
+    if (stack) console.error("[REGISTER STACK]", stack);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      {
+        error: "Error interno del servidor",
+        // Solo en desarrollo, exponer detalles del error
+        ...(process.env.NODE_ENV !== "production" && { detail: message }),
+      },
       { status: 500 }
     );
   }

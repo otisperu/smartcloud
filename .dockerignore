@@ -6,8 +6,8 @@ npm-debug.log*
 .next
 out
 
-# Prisma generated
-prisma/migrations
+# Prisma (no excluir migrations - necesarias para deploy)
+# prisma/migrations
 
 # Env files
 .env*
