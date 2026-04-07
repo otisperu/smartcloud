@@ -1,7 +1,8 @@
 FROM node:20-alpine AS base
 
-# ── Stage 1: Install dependencies ──────────────────────────────────────────
+# ── Stage 1: Dependencias ──────────────────────────────────────────────────
 FROM base AS deps
+# Instalamos libc6-compat y openssl para que Prisma funcione en Alpine
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
@@ -9,20 +10,27 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 RUN npm ci
 
-# ── Stage 2: Build ─────────────────────────────────────────────────────────
+# ── Stage 2: Construcción ───────────────────────────────────────────────────
 FROM base AS builder
+# Necesitamos openssl también en el builder para prisma generate
+RUN apk add --no-cache openssl
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client before building
+# Desactivamos telemetría
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Generamos el Cliente de Prisma
 RUN npx prisma generate
 
-ENV NEXT_TELEMETRY_DISABLED=1
+# IMPORTANTE: Saltamos el chequeo de base de datos durante el build de Next.js
+# Esto evita que el despliegue falle si el VPS de base de datos no está listo
+ENV SKIP_PRISMA_BUILD_CHECK=true
 RUN npm run build
 
-# ── Stage 3: Production runner ─────────────────────────────────────────────
+# ── Stage 3: Ejecución Producción ──────────────────────────────────────────
 FROM base AS runner
 WORKDIR /app
 
@@ -32,6 +40,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Creamos la carpeta public si no existe para evitar errores al copiar
+RUN mkdir -p public
+
+# Copiamos solo lo necesario del builder (archivo standalone)
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static

@@ -1,7 +1,7 @@
 services:
   frontend:
     build: .
-    container_name: smartcloudops-app
+    container_name: smartcloud-frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -12,23 +12,23 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     depends_on:
-      postgres:
+      database:
         condition: service_healthy
 
-  postgres:
+  database:
     image: postgres:16-alpine
-    container_name: smartcloudops-db
+    container_name: smartcloud-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: smartcloud
-      POSTGRES_PASSWORD: smartcloud
-      POSTGRES_DB: smartcloudops
+      POSTGRES_USER: ${POSTGRES_USER:-smartcloud}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartcloud}
+      POSTGRES_DB: ${POSTGRES_DB:-smartcloudops}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U smartcloud -d smartcloudops"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartcloud} -d ${POSTGRES_DB:-smartcloudops}"]
       interval: 5s
       timeout: 5s
       retries: 10
