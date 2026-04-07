@@ -11,6 +11,7 @@ Seguimiento puntual de cada sub-tarea. Una tarea se marca completada solo cuando
 - [x] `docker-compose.yml` con servicios `app` + `postgres:16-alpine`
 - [x] `.dockerignore` configurado
 - [x] `next.config.mjs` con `output: 'standalone'`
+- [x] Carpeta `public/` creada (Requisito de build)
 - [ ] *Verificación:* `docker compose up` levanta la app en `localhost:3000` sin errores
 
 ### 1.2 Dependencias y Setup
@@ -20,12 +21,11 @@ Seguimiento puntual de cada sub-tarea. Una tarea se marca completada solo cuando
 - [x] `autoprefixer` instalado
 - [x] *Verificación:* `npm run build` completa sin errores — ✅ Build exitoso
 
-### 1.3 Base de Datos (Prisma + PostgreSQL)
-- [x] Schema actualizado: `User` con campos NextAuth (`name`, `emailVerified`, `image`)
-- [x] Modelos NextAuth agregados: `Account`, `Session`, `VerificationToken`
-- [x] Relaciones correctas entre los 6 modelos principales
-- [ ] `prisma migrate dev` ejecutado en contenedor con la DB activa
-- [ ] *Verificación:* `npx prisma studio` muestra todas las tablas y se pueden crear registros
+### 1.3 Base de Datos (Dokploy Add-on)
+- [x] Schema inicial de servicios y usuarios definido en `prisma/schema.prisma`
+- [ ] Crear Add-on de PostgreSQL en Dokploy (Mismo proyecto)
+- [ ] Configurar `DATABASE_URL` usando la "Internal Connection String"
+- [ ] *Verificación:* Build exitoso en Dokploy (Prisma genera cliente post-install)
 
 ### 1.4 Autenticación (NextAuth.js)
 - [x] `src/lib/auth.ts` con `authOptions`: Credentials + Google OAuth

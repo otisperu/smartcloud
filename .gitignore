@@ -29,3 +29,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# Google OAuth secrets (NEVER push these)
+client_secret_*.json

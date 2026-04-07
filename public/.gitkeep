@@ -1,0 +1,2 @@
+# Este archivo asegura que Git conserve la carpeta public aunque esté vacía por ahora.
+# Next.js requiere que esta carpeta exista durante el build si el Dockerfile la intenta copiar.
