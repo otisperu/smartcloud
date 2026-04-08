@@ -14,6 +14,12 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.smartcloud-frontend.rule=Host(`${DOMAIN:-cloud.otisperu.com}`)"
+      - "traefik.http.services.smartcloud-frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.smartcloud-frontend.entrypoints=websecure"
+      - "traefik.http.routers.smartcloud-frontend.tls.certresolver=letsencrypt"
 
   postgresql:
     image: postgres:16-alpine
