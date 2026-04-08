@@ -48,10 +48,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
-# Prisma CLI para poder ejecutar db push en startup
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
-
+# Instalar Prisma CLI para poder ejecutar db push en startup (mucho más seguro que copiar binarios sueltos)
+RUN npm install prisma@5.14.0
 # Schema de Prisma para db push
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
