@@ -12,10 +12,10 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     depends_on:
-      database:
+      postgresql:
         condition: service_healthy
 
-  database:
+  postgresql:
     image: postgres:16-alpine
     container_name: smartcloud-db
     restart: unless-stopped
