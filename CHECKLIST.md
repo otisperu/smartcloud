@@ -12,7 +12,7 @@ Seguimiento puntual de cada sub-tarea. Una tarea se marca completada solo cuando
 - [x] `.dockerignore` configurado
 - [x] `next.config.mjs` con `output: 'standalone'`
 - [x] Carpeta `public/` creada (Requisito de build)
-- [ ] *Verificación:* `docker compose up` levanta la app en `localhost:3000` sin errores
+- [x] *Verificación:* `docker compose up` levanta la app en `localhost:3000` y Dokploy sin errores — ✅ Confirmado
 
 ### 1.2 Dependencias y Setup
 - [x] `next-auth`, `@next-auth/prisma-adapter`, `bcryptjs` instalados
@@ -21,11 +21,11 @@ Seguimiento puntual de cada sub-tarea. Una tarea se marca completada solo cuando
 - [x] `autoprefixer` instalado
 - [x] *Verificación:* `npm run build` completa sin errores — ✅ Build exitoso
 
-### 1.3 Base de Datos (Dokploy Add-on)
+### 1.3 Base de Datos y Prisma
 - [x] Schema inicial de servicios y usuarios definido en `prisma/schema.prisma`
-- [ ] Crear Add-on de PostgreSQL en Dokploy (Mismo proyecto)
-- [ ] Configurar `DATABASE_URL` usando la "Internal Connection String"
-- [ ] *Verificación:* Build exitoso en Dokploy (Prisma genera cliente post-install)
+- [x] Levantar PostgreSQL vía Docker Compose
+- [x] Configurar `DATABASE_URL` usando la IP / Hostname validado de red (`postgresql`)
+- [x] *Verificación:* Build y migración (`db push`) exitoso en Dokploy — ✅ Confirmado
 
 ### 1.4 Autenticación (NextAuth.js)
 - [x] `src/lib/auth.ts` con `authOptions`: Credentials + Google OAuth
@@ -38,8 +38,8 @@ Seguimiento puntual de cada sub-tarea. Una tarea se marca completada solo cuando
 ### 1.5 Autenticación Google OAuth
 - [x] Google provider habilitado en `authOptions`
 - [x] Botón "Continuar con Google" en login y registro
-- [ ] `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` configurados en `.env`
-- [ ] *Verificación:* Flujo Google OAuth completo funciona en entorno local y Docker
+- [x] `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` configurados en `.env`
+- [x] *Verificación:* Flujo Google OAuth completo funciona en entorno local y Docker — ✅ Confirmado
 
 ### 1.6 Design System & UI Base
 - [x] `globals.css` con tokens CSS (colores brand, tipografía Inter, animaciones)
@@ -54,7 +54,7 @@ Seguimiento puntual de cada sub-tarea. Una tarea se marca completada solo cuando
 - [x] `src/app/(auth)/layout.tsx` — layout centrado sin sidebar
 - [x] `src/app/(auth)/login/page.tsx` — formulario email + contraseña + botón Google
 - [x] `src/app/(auth)/register/page.tsx` — formulario nombre + email + contraseña + Google
-- [ ] *Verificación:* Formularios validan campos vacíos y muestran errores. Diseño premium y responsivo
+- [x] *Verificación:* Formularios validan campos vacíos y muestran errores. Diseño premium y responsivo — ✅ Confirmado
 
 ### 1.8 Dashboard UI (Datos Mock)
 - [x] `src/components/dashboard/sidebar.tsx` — navegación con íconos Lucide + ruta activa
@@ -63,11 +63,11 @@ Seguimiento puntual de cada sub-tarea. Una tarea se marca completada solo cuando
 - [x] `src/app/(dashboard)/dashboard/page.tsx` — resumen con stats cards y lista de despliegues
 - [x] `src/app/(dashboard)/plans/page.tsx` — grid de planes Starter/Business/Enterprise
 - [x] `src/app/(dashboard)/deployments/page.tsx` — tabla con estados badge variados
-- [ ] *Verificación:* Navegación fluida entre secciones. Badge de estado reflejan colores correctos. Diseño profesional y consistente
+- [x] *Verificación:* Navegación fluida entre secciones. Badge de estado reflejan colores correctos. Diseño profesional y consistente — ✅ Confirmado
 
 ### 1.9 Variables de Entorno
 - [x] `.env.example` actualizado con `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `DATABASE_URL` apuntando a servicio Docker
-- [ ] *Verificación:* `.env` local funciona tanto con `npm run dev` como con `docker compose up`
+- [x] *Verificación:* `.env` funciona en Dokploy con variables resueltas, Traefik ruteando dominio y DB conectando — ✅ Confirmado
 
 ---
 
