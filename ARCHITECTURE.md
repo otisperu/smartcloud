@@ -98,6 +98,16 @@ app.smartcloud.app   → smartcloud-app:3000
 > Los VPS de clientes son instancias Contabo separadas, cada una con su propia
 > instalación Docker gestionada por los scripts de aprovisionamiento de SmartCloudOPS.
 
+### 4.1 Configuraciones Críticas para Dokploy / Prisma
+
+Existen consideraciones específicas para el despliegue del modo `standalone` de Next.js mediante **Dokploy** y **Prisma**:
+
+1. **Resolución de Hostnames (Network interno de Docker Compose):**
+   Si la variable de entorno `.env` declara \`DATABASE_URL="postgresql://user:pass@postgresql:5432/..."\`, el servicio en el \`docker-compose.yml\` **debe** llamarse obligatoriamente \`postgresql\` y no "database" genéricamente. De lo contrario, Dokploy y el internal DNS de Docker de Compose levantarán un error \`P1001: Can't reach database server at postgresql:5432\` durante el inicio del contenedor frontend (migraciones Prisma).
+   
+2. **Prisma CLI y Error de Motores `.wasm`:**
+   Dado que el Dockerfile usa `output: standalone`, los paquetes de Prisma generados en el *builder stage* pierden referencias y ficheros `.wasm` al hacer un COPY duro de las carpetas `.bin`. **La solución estándar arquitectural para SmartCloudOPS** es ejecutar `RUN npm install prisma@5.14.0` explícitamente dentro de la última etapa (Runner) del Dockerfile. Esto garantiza que la ejecución de `npx prisma db push --skip-generate` durante el script `entrypoint.sh` encuentre sus binarios WASM nativos.
+
 ---
 
 ## 5. Modelo de Datos Core
