@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,8 +42,27 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Crear token de verificación UUID
+    const token = crypto.randomUUID();
+    const expires = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
+
+    await prisma.verificationToken.create({
+      data: {
+        identifier: email,
+        token,
+        expires,
+      },
+    });
+
+    // Enviar correo de verificación (no bloqueante)
+    sendVerificationEmail({
+      to: email,
+      token,
+      name,
+    }).catch((err: unknown) => console.error("Error enviando email SMTP:", err));
+
     return NextResponse.json(
-      { id: user.id, email: user.email, name: user.name },
+      { id: user.id, email: user.email, name: user.name, pendingVerification: true },
       { status: 201 }
     );
   } catch (error) {
