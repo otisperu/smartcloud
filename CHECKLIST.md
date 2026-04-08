@@ -4,7 +4,7 @@ Seguimiento puntual de cada sub-tarea. Una tarea se marca completada solo cuando
 
 ---
 
-## Fase 1: Panel de Control Base · 🔄 En curso
+## Fase 1: Panel de Control Base · ✅ Completada
 
 ### 1.1 Docker & Infraestructura Local
 - [x] `Dockerfile` multi-stage (deps → builder → runner) con `node:20-alpine`
@@ -71,7 +71,7 @@ Seguimiento puntual de cada sub-tarea. Una tarea se marca completada solo cuando
 
 ---
 
-## Fase 2: Motor de Aprovisionamiento · Pendiente
+## Fase 2: Motor de Aprovisionamiento · 🔄 En curso
 
 ### 2.1 API de Contabo
 - [ ] Generar credenciales OAuth2 reales de Contabo
